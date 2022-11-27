@@ -1,0 +1,15 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Assembly Operations</h1>
+
+<button class="btn btn-primary" @onclick="() => Modal.Open()">Create</button>
+
+<Create @ref="Modal" />
+
+<List />
+
+@code {
+    private Create Modal { get; set; }
+}

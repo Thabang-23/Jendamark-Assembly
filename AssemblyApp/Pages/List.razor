@@ -1,0 +1,45 @@
+@page "/operations"
+@using AssemblyApp.Models
+@inject AssemblyApp.Data.OperationService OperationService
+
+<PageTitle>Assembly | Home</PageTitle>
+
+@if (Operations == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Order In Which To Operate</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var operation in Operations)
+            {
+                <tr>
+                    <td>@operation.ImageData</td>
+                    <td>@operation.Name</td>
+                    <td>@operation.OrderInWhichToPerform</td>
+                    <td>
+                        <button class="btn btn-primary">Edit</button> | <button class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Operation>? Operations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Operations = await OperationService.GetOperations();
+    }
+}
