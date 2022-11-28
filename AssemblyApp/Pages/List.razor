@@ -1,8 +1,13 @@
 @page "/operations"
 @using AssemblyApp.Models
+@inject AssemblyApp.Data.DeviceService DeviceService
 @inject AssemblyApp.Data.OperationService OperationService
 
 <PageTitle>Assembly | Home</PageTitle>
+
+<button class="btn btn-primary" @onclick="() => Modal.Open()">Create</button>
+
+<Create @ref="Modal" Devices="@Devices" />
 
 @if (Operations == null)
 {
@@ -16,6 +21,7 @@ else
                 <th>Image</th>
                 <th>Name</th>
                 <th>Order In Which To Operate</th>
+                <th>Device</th>
                 <th></th>
             </tr>
         </thead>
@@ -26,8 +32,9 @@ else
                     <td>@operation.ImageData</td>
                     <td>@operation.Name</td>
                     <td>@operation.OrderInWhichToPerform</td>
+                    <td>@operation.Device.Name</td>
                     <td>
-                        <button class="btn btn-primary">Edit</button> | <button class="btn btn-danger">Delete</button>
+                        <button class="btn btn-danger" @onclick="@(() => RemoveAsync(operation.OperationID))">Delete</button>
                     </td>
                 </tr>
             }
@@ -36,10 +43,26 @@ else
 }
 
 @code {
-    private List<Operation>? Operations;
-
+    private Create Modal { get; set; }
+    private List<Operation> Operations = new List<Operation>();
+    private IEnumerable<Device>? Devices;
     protected override async Task OnInitializedAsync()
     {
-        Operations = await OperationService.GetOperations();
+        var operationsViewModel = await OperationService.GetOperations();
+        var devices = DeviceService.GetDevices();
+
+        foreach(var Operation in operationsViewModel)
+        {
+            Devices = devices;
+            var device = devices.FirstOrDefault(x => x.DeviceID == Operation.DeviceID);
+            Operation.Device = device;
+
+            Operations.Add(Operation);
+        }
+    }
+
+    public void RemoveAsync(int id)
+    {
+        OperationService.RemoveItem(id);
     }
 }
